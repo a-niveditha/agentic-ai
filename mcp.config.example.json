@@ -1,0 +1,17 @@
+{
+  "servers": {
+    "filesystem": {
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/allowed/dir"],
+      "requiredScopes": ["mcp"],
+      "toolTimeoutMs": 30000
+    },
+    "remote-example": {
+      "transport": "http",
+      "url": "https://mcp.example.com/mcp",
+      "headers": { "Authorization": "Bearer <token>" },
+      "requiredScopes": ["mcp", "admin"]
+    }
+  }
+}

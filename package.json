@@ -1,0 +1,35 @@
+{
+  "name": "agentic-ai-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "agent",
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev:backend": "bun --filter @agentic-ai/backend dev",
+    "dev:frontend": "bun --filter @agentic-ai/frontend dev",
+    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"cyan,green\" \"bun dev:backend\" \"bun dev:frontend\"",
+    "chroma": "mkdir -p data/chroma && node agent/node_modules/chromadb/dist/cli.mjs run --path data/chroma --port 8000",
+    "typecheck": "bun --filter @agentic-ai/agent typecheck && bun --filter @agentic-ai/backend typecheck && bun --filter @agentic-ai/frontend typecheck && tsc --noEmit -p tsconfig.test.json",
+    "test:unit": "bun test --coverage $(find agent backend -name '*.unit.test.ts' -not -path '*/node_modules/*') && bun --filter @agentic-ai/frontend test:unit",
+    "test:integration": "bun test --timeout 120000 --max-concurrency 1 $(find agent backend tests -name '*.int.test.ts' -not -path '*/node_modules/*') && bun --filter @agentic-ai/frontend test:integration",
+    "test:e2e": "bun test --timeout 300000 --max-concurrency 1 tests/e2e && bun --filter @agentic-ai/frontend test:e2e",
+    "test:security": "bun test --timeout 120000 --max-concurrency 1 tests/security",
+    "test": "bun run test:unit && bun run test:integration && bun run test:e2e && bun run test:security"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^26.6.5",
+    "@types/papaparse": "^5.5.2",
+    "@types/ws": "^8.18.2",
+    "bun-types": "^1.1.18",
+    "concurrently": "^8.2.2",
+    "jsonwebtoken": "^9.0.3",
+    "jszip": "^3.10.2",
+    "typescript": "^7.0.2",
+    "zod": "^3.25.76"
+  },
+  "type": "module"
+}

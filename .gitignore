@@ -1,0 +1,33 @@
+# Node dependencies
+node_modules/
+.npm
+
+# Builds & Outputs
+dist/
+build/
+.next/
+out/
+frontend/test-results/
+frontend/playwright-report/
+*.tsbuildinfo
+
+# Database & Environment
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+*.db
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Python legacy
+__pycache__/
+*.pyc
+.venv/
+
+# Local vector store data (disk Chroma)
+data/

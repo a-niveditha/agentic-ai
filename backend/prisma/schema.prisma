@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  sessions     ChatSession[]
+  documents    Document[]
+}
+
+model ChatSession {
+  id        String        @id @default(uuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String        @default("New Conversation")
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  messages  ChatMessage[]
+
+  @@index([userId, updatedAt])
+}
+
+model ChatMessage {
+  id        String      @id @default(uuid())
+  sessionId String
+  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sender    String // "user" | "agent"
+  content   String
+  metadata  String? // JSON: citations, tool calls, run status
+  createdAt DateTime    @default(now())
+
+  @@index([sessionId, createdAt])
+}
+
+model Document {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  filename     String
+  mimeType     String   @default("text/plain")
+  sourceUrl    String?
+  status       String   @default("processing") // processing | ready | failed
+  errorMessage String?
+  chunksCount  Int      @default(0)
+  // Extracted text, kept so a failed/obsolete index can be rebuilt (retry, re-embedding) without a re-upload.
+  content      String?
+  // sha256 of the extracted text. Unique per user, so the same content cannot be added twice (even concurrently).
+  contentHash  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([userId, contentHash])
+  @@index([userId, createdAt])
+}
